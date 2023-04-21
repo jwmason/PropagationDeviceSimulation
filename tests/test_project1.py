@@ -2,7 +2,7 @@ import unittest
 import tempfile
 import os
 from pathlib import Path
-from project1 import read_input_file_contents, _read_input_file_path
+from readinput import read_input_file_contents
 class TestProject1(unittest.TestCase):
     """Testing all functions in project1.py"""
     def test_read_input_file(self):
@@ -17,3 +17,8 @@ class TestProject1(unittest.TestCase):
         # Delete the test file after unittest
         os.remove(temp_file.name)
         self.assertEqual(output, expected_output)
+        self.assertEqual(type(output), list)
+
+
+if __name__ == '__main__':
+    unittest.main()
