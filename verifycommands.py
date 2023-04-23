@@ -3,8 +3,11 @@ def get_commands(input_list) -> list:
     """Stores and returns all possible commands into a list"""
     cmd_list = []
     for cmd in input_list:
+
+        print(input_list)
         # Splits the command by space and grabs the first word to see if it is a command or not
-        first_word = cmd.split()[0]
+        if (cmd != '\n') and (cmd != ' \n'):
+            first_word = cmd.split()[0]
         all_possible_cmds = ['LENGTH', 'DEVICE', 'PROPAGATE', 'ALERT', 'CANCEL']
         # If line is a possible command, adds to command list
         if first_word in all_possible_cmds:
@@ -52,11 +55,13 @@ def verify_commands_parameters(cmd_list) -> list:
         # Checking that PROPAGATE three positive integer values, and that those devices exist
         elif first_word == 'PROPAGATE':
             device_1, device_2, time_pass = command_word_length[1:]
-            print(device_1, device_2, time_pass)
+            device_1 = int(device_1)
+            device_2 = int(device_2)
             if (type(device_1) is int and device_1 > 0) and (type(device_2) is int and device_2 > 0):
                 device_1 = 'DEVICE ' + str(device_1)
                 device_2 = 'DEVICE ' + str(device_2)
-                if (device_1 not in cmd_list) or (device_2 not in cmd_list):
+                print(device_1, device_2)
+                if (device_1 in cmd_list) and (device_2 in cmd_list):
                     valid_cmds.append(cmd)
             else:
                 valid_cmds.append(cmd)
@@ -79,5 +84,3 @@ def verify_commands_parameters(cmd_list) -> list:
             else:
                 valid_cmds.append(cmd)
     return valid_cmds
-
-print(verify_commands_length(['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE 50 12 10', 'CANCEL 50 testerror 3']))
