@@ -1,3 +1,5 @@
+"""This module reads the contents of the input file"""
+
 from pathlib import Path
 
 
