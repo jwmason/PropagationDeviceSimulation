@@ -45,7 +45,7 @@ class TestVerifyCommands(unittest.TestCase):
         """Tests if the commands have the correct parameter amounts"""
         test_cmd_list = ['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE 50 12 10', 'CANCEL 50 testerror 3']
         test_cmd_list = get_commands(test_cmd_list)
-        # test_cmd_list = verify_commands_length(test_cmd_list)
+        test_cmd_list = verify_commands_length(test_cmd_list)
         # Using the function in testing
         print(test_cmd_list)
         test_cmd_list = verify_commands_parameters(test_cmd_list)

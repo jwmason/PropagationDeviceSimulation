@@ -26,7 +26,7 @@ def verify_commands_length(cmd_list) -> list:
                 cmd_list.remove(cmd)
         # Checking that PROPAGATE, ALERT, and CANCEL commands have three parameters
         elif first_word == 'PROPAGATE' or first_word == 'ALERT' or first_word == 'CANCEL':
-            if not len(command_word_length) == 3:
+            if not len(command_word_length) == 4:
                 cmd_list.remove(cmd)
     return cmd_list
 
@@ -80,4 +80,4 @@ def verify_commands_parameters(cmd_list) -> list:
                 valid_cmds.append(cmd)
     return valid_cmds
 
-print(verify_commands_parameters(['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE 50 12 10', 'CANCEL 50 testerror 3']))
+print(verify_commands_length(['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE 50 12 10', 'CANCEL 50 testerror 3']))
