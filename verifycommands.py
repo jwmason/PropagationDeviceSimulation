@@ -105,7 +105,7 @@ def check_alert_and_cancel(command_word_length, first_word, cmd, valid_cmds, cmd
             device = int(device)
             message = str(message)
             time = int(time)
-            if device > 0 and time > 0 and (time < int(length_dict['LENGTH'])):
+            if device > 0 and time >= 0 and (time < int(length_dict['LENGTH'])):
                 device = 'DEVICE ' + str(device)
                 if device in cmd_list:
                     valid_cmds.append(cmd)

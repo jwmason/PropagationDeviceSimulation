@@ -7,11 +7,15 @@ import unittest
 import tempfile
 import os
 
+# Import these modules to test print output
+import contextlib
+import io
+
 # Importing all tested functions
 from readinput import read_input_file_contents
 from verifycommands import get_commands, verify_commands_length, verify_commands_parameters
 from sortcommands import sort_cmd_list, sort_set_up_list, sort_command_list
-from runcommands import run_set_up_commands
+from runcommands import run_set_up_commands, run_command_commands
 from commandconstants import Constants
 
 class TestReadInput(unittest.TestCase):
@@ -110,6 +114,22 @@ class TestRunCommands(unittest.TestCase):
         self.assertEqual(test_constants.length, 123)
         self.assertEqual(test_constants.device_number_list, [50, 12])
         self.assertEqual(test_constants.propagate, [[50, 12, 10]])
+
+    def test_run_command_commands(self):
+        """Tests if 'command' commands are run correctly"""
+        test_command_list = ['ALERT 50 ohno 0', 'CANCEL 50 testerror 200']
+        test_constants = Constants()
+        test_constants.length = 500
+        test_constants.device_number_list = [50, 12]
+        test_constants.propagate = [[50, 12, 10]]
+        # Testing function
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            run_command_commands(test_command_list, test_constants)
+        expected_output = '@0: #50 SENT ALERT TO #12: ohno\n' \
+                          '@10: #12 RECEIVED ALERT FROM #50: ohno\n' \
+                          '@200: #50 SENT CANCELLATION TO #12: testerror\n' \
+                          '@210: #12 RECEIVED CANCELLATION FROM #50: testerror\n'
+        self.assertEqual(output.getvalue(), expected_output)
 
 if __name__ == '__main__':
     unittest.main()
