@@ -17,6 +17,7 @@ def sort_cmd_list(cmd_list) -> list:
             command_list.append(command)
     return set_up_list, command_list
 
+
 def sort_set_up_list(set_up_list) -> list:
     """Moves PROPAGATE commands to the end of the set-up list
     in order to establish devices and length first"""
@@ -27,3 +28,10 @@ def sort_set_up_list(set_up_list) -> list:
             set_up_list.append(command)
     return set_up_list
 
+
+def sort_command_list(command_list) -> list:
+    """Sort command list so that commands will be in order of
+    simulated time"""
+    # The sorted function goes through the list and sorts based
+    # on the value of the last integer in each command
+    return sorted(command_list, key = lambda command: int(command.split()[-1]))

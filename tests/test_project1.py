@@ -10,7 +10,7 @@ import os
 # Importing all tested functions
 from readinput import read_input_file_contents
 from verifycommands import get_commands, verify_commands_length, verify_commands_parameters
-from sortcommands import sort_cmd_list, sort_set_up_list
+from sortcommands import sort_cmd_list, sort_set_up_list, sort_command_list
 
 class TestReadInput(unittest.TestCase):
     """Testing functions in readinput.py"""
@@ -83,12 +83,20 @@ class TestSortCommands(unittest.TestCase):
         self.assertEqual(test_command_list, expected_command_list)
 
     def test_sort_set_up_list(self):
-        """This tests if the function properly sorts the list"""
+        """This tests if the function properly sorts the set-up list"""
         test_set_up = ['PROPAGATE 50 12 10', 'LENGTH 123', 'DEVICE 50', 'DEVICE 12']
         # Testing function here
         set_up_list = sort_set_up_list(test_set_up)
         expected_set_up_list = ['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE 50 12 10']
         self.assertEqual(set_up_list, expected_set_up_list)
+
+    def test_sort_command_list(self):
+        """This tests if function properly sorts the command list"""
+        test_command = ['ALERT 1 ohno 100', 'CANCEL 50 testerror 3', 'CANCEL 3 test 55']
+        # Testing function here
+        command_list = sort_command_list(test_command)
+        expected_command_list = ['CANCEL 50 testerror 3', 'CANCEL 3 test 55', 'ALERT 1 ohno 100']
+        self.assertEqual(command_list, expected_command_list)
 
 if __name__ == '__main__':
     unittest.main()
