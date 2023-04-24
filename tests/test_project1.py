@@ -11,6 +11,8 @@ import os
 from readinput import read_input_file_contents
 from verifycommands import get_commands, verify_commands_length, verify_commands_parameters
 from sortcommands import sort_cmd_list, sort_set_up_list, sort_command_list
+from runcommands import run_set_up_commands
+from commandconstants import Constants
 
 class TestReadInput(unittest.TestCase):
     """Testing functions in readinput.py"""
@@ -97,6 +99,17 @@ class TestSortCommands(unittest.TestCase):
         command_list = sort_command_list(test_command)
         expected_command_list = ['CANCEL 50 testerror 3', 'CANCEL 3 test 55', 'ALERT 1 ohno 100']
         self.assertEqual(command_list, expected_command_list)
+
+class TestRunCommands(unittest.TestCase):
+    """This tests functions within runcommands.py"""
+    def test_set_up_commands(self):
+        """Tests if set-up commands are run correctly"""
+        test_set_up = ['PROPAGATE 50 12 10', 'LENGTH 123', 'DEVICE 50', 'DEVICE 12']
+        # Testing function
+        test_constants = run_set_up_commands(test_set_up)
+        self.assertEqual(test_constants.length, 123)
+        self.assertEqual(test_constants.device_number_list, [50, 12])
+        self.assertEqual(test_constants.propagate, [[50, 12, 10]])
 
 if __name__ == '__main__':
     unittest.main()
