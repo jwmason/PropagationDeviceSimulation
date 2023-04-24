@@ -9,6 +9,7 @@ def get_commands(input_list) -> list:
         all_possible_cmds = ['LENGTH', 'DEVICE', 'PROPAGATE', 'ALERT', 'CANCEL']
         # If line is a possible command, adds to command list
         if first_word in all_possible_cmds:
+            # Get rid of the '\n' at the end of each line
             cmd = cmd.strip('\n')
             cmd_list.append(cmd)
     return cmd_list
