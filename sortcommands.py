@@ -17,3 +17,13 @@ def sort_cmd_list(cmd_list) -> list:
             command_list.append(command)
     return set_up_list, command_list
 
+def sort_set_up_list(set_up_list) -> list:
+    """Moves PROPAGATE commands to the end of the set-up list
+    in order to establish devices and length first"""
+    for command in set_up_list:
+        # This basically moves propagate to the end of the set-up list
+        if command.startswith('PROPAGATE'):
+            set_up_list.remove(command)
+            set_up_list.append(command)
+    return set_up_list
+
