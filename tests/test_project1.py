@@ -33,22 +33,22 @@ class TestVerifyCommands(unittest.TestCase):
 
     def test_verify_commands_length(self):
         """Tests if the commands have the correct parameter amounts"""
-        test_cmd_list = ['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE', 'CANCEL 1 2 3']
+        test_cmd_list = ['LENGTH 123', 'DEVICE 1 1', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE', 'PROPAGATE 1 2 3', 'ALERT 1 2 3', 'ALERT 1 3', 'CANCEL 1 2 3', 'CANCEL 1 2']
         test_cmd_list = get_commands(test_cmd_list)
         # Using the function in testing
         test_cmd_list = verify_commands_length(test_cmd_list)
-        expected_cmd_list = ['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'CANCEL 1 2 3']
+        expected_cmd_list = ['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE 1 2 3', 'ALERT 1 2 3', 'CANCEL 1 2 3']
         self.assertEqual(test_cmd_list, expected_cmd_list)
 
     def test_verify_commands_parameters(self):
         """Tests if the parameters are eligible to be executed"""
         """Tests if the commands have the correct parameter amounts"""
-        test_cmd_list = ['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE 12 10 10', 'PROPAGATE 50 12 10', 'CANCEL 50 testerror 3']
+        test_cmd_list = ['LENGTH 123', 'DEVICE abc', 'DEVICE -1', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE 12 10 10', 'PROPAGATE 1 -1 100',
+                         'PROPAGATE a b c', 'PROPAGATE 50 12 10', 'ALERT a b c', 'ALERT 1 ohno 100', 'CANCEL -1 nono -1', 'CANCEL 50 testerror 3']
         test_cmd_list = get_commands(test_cmd_list)
         test_cmd_list = verify_commands_length(test_cmd_list)
         # Using the function in testing
         test_cmd_list = verify_commands_parameters(test_cmd_list)
-        print(test_cmd_list)
         expected_cmd_list = ['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE 50 12 10', 'CANCEL 50 testerror 3']
         self.assertEqual(test_cmd_list, expected_cmd_list)
 
