@@ -4,14 +4,16 @@ def get_commands(input_list) -> list:
     cmd_list = []
     for cmd in input_list:
         # Splits the command by space and grabs the first word to see if it is a command or not
-        if (cmd != '\n') and (cmd != ' \n'):
+        if (cmd != '\n') and (cmd != ' \n') and (cmd != ''):
             first_word = cmd.split()[0]
         all_possible_cmds = ['LENGTH', 'DEVICE', 'PROPAGATE', 'ALERT', 'CANCEL']
         # If line is a possible command, adds to command list
-        if first_word in all_possible_cmds:
+        if first_word in all_possible_cmds and first_word is not None:
             # Get rid of the '\n' at the end of each line
             cmd = cmd.strip('\n')
             cmd_list.append(cmd)
+    # Remove empty strings from the list
+    cmd_list = list(filter(None, cmd_list))
     return cmd_list
 
 

@@ -25,16 +25,19 @@ def run_command_commands(command_list, constants):
     """Runs the 'command' commands, ALERT and CANCEL"""
     for command in command_list:
         device, message, sim_time = command.split()[1:]
+        # Set the correct types for each variable
         device = int(device)
         message = str(message)
         sim_time = int(sim_time)
         if command.startswith('ALERT'):
             for prop in constants.propagate:
+                # Checks each propagate to see if device can send ALERT
                 if int(prop[0]) == device:
                     print(f'@{sim_time}: #{device} SENT ALERT TO #{prop[1]}: {message}')
                     print(f'@{sim_time + int(prop[2])}: #{prop[1]} RECEIVED ALERT FROM #{device}: {message}')
         elif command.startswith('CANCEL'):
             for prop in constants.propagate:
+                # Checks each propagate to see if device can send CANCEL
                 if int(prop[0]) == device:
                     print(f'@{sim_time}: #{device} SENT CANCELLATION TO #{prop[1]}: {message}')
                     print(f'@{sim_time + int(prop[2])}: #{prop[1]} RECEIVED CANCELLATION FROM #{device}: {message}')
