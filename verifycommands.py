@@ -1,7 +1,5 @@
 """This module is in charge of verifying commands from input file"""
 
-from length import Length
-
 
 def get_commands(input_list) -> list:
     """Stores and returns all possible commands into a list"""

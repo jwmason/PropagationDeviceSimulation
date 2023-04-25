@@ -5,6 +5,7 @@ class Device:
     """This class creates a device and holds values"""
     def __init__(self):
         """Stores LENGTH, DEVICE, and PROPAGATE commands specific to its ID"""
+        self.current_length = 0
         self.length = None
         self.device_id = None
         self.propagate = []
