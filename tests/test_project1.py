@@ -16,7 +16,7 @@ from readinput import read_input_file_contents
 from verifycommands import get_commands, verify_commands_length, verify_commands_parameters
 from sortcommands import sort_cmd_list, sort_set_up_list, sort_command_list
 from runcommands import run_set_up_commands, run_command_commands
-from commandconstants import Constants
+from devices import Device
 
 class TestReadInput(unittest.TestCase):
     """Testing functions in readinput.py"""
@@ -89,11 +89,13 @@ class TestSortCommands(unittest.TestCase):
         self.assertEqual(test_command_list, expected_command_list)
 
     def test_sort_set_up_list(self):
-        """This tests if the function properly sorts the set-up list"""
+        """This tests if the function properly sorts the device and set-up lists"""
         test_set_up = ['PROPAGATE 50 12 10', 'LENGTH 123', 'DEVICE 50', 'DEVICE 12']
         # Testing function here
-        set_up_list = sort_set_up_list(test_set_up)
-        expected_set_up_list = ['LENGTH 123', 'DEVICE 50', 'DEVICE 12', 'PROPAGATE 50 12 10']
+        devices_list, set_up_list = sort_set_up_list(test_set_up)
+        expected_devices_list = ['DEVICE 50', 'DEVICE 12']
+        expected_set_up_list = ['PROPAGATE 50 12 10', 'LENGTH 123']
+        self.assertEqual(devices_list, expected_devices_list)
         self.assertEqual(set_up_list, expected_set_up_list)
 
     def test_sort_command_list(self):
@@ -110,21 +112,21 @@ class TestRunCommands(unittest.TestCase):
         """Tests if set-up commands are run correctly"""
         test_set_up = ['PROPAGATE 50 12 10', 'LENGTH 123', 'DEVICE 50', 'DEVICE 12']
         # Testing function
-        test_constants = run_set_up_commands(test_set_up)
-        self.assertEqual(test_constants.length, 123)
-        self.assertEqual(test_constants.device_number_list, [50, 12])
-        self.assertEqual(test_constants.propagate, [[50, 12, 10]])
+        test_device = run_set_up_commands(test_set_up)
+        self.assertEqual(test_device.length, 123)
+        self.assertEqual(test_device.device_number_list, [50, 12])
+        self.assertEqual(test_device.propagate, [[50, 12, 10]])
 
     def test_run_command_commands(self):
         """Tests if 'command' commands are run correctly"""
         test_command_list = ['ALERT 50 ohno 0', 'CANCEL 50 testerror 200']
-        test_constants = Constants()
-        test_constants.length = 500
-        test_constants.device_number_list = [50, 12]
-        test_constants.propagate = [[50, 12, 10]]
+        test_device = Device()
+        test_device.length = 500
+        test_device.device_id = [50, 12]
+        test_device.propagate.append([12, 10])
         # Testing function
         with contextlib.redirect_stdout(io.StringIO()) as output:
-            run_command_commands(test_command_list, test_constants)
+            run_command_commands(test_command_list, test_device)
         expected_output = '@0: #50 SENT ALERT TO #12: ohno\n' \
                           '@10: #12 RECEIVED ALERT FROM #50: ohno\n' \
                           '@200: #50 SENT CANCELLATION TO #12: testerror\n' \

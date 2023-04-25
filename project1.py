@@ -10,3 +10,5 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+
+# C:\Users\mwong\ics33\project1\samples\sample_input.txt

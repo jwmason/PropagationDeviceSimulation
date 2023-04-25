@@ -1,13 +1,12 @@
 """This module runs the commands after filtering and sorting"""
 
-from commandconstants import Constants
+from devices import Device
 
 
-def run_set_up_commands(set_up_list) -> Constants:
-    """Runs the set-up commands, LENGTH and DEVICE, then PROPAGATE"""
-    # Initialize a Constants class
-    constants = Constants()
+def run_set_up_commands(set_up_list) -> Device:
+    """Runs the set-up commands, Storing LENGTH, DEVICE, and PROPAGATE in Device"""
     for command in set_up_list:
+        # Initialize a Device class for each device
         # Run the LENGTH command
         if command.startswith('LENGTH'):
             constants.length = int(command.split()[-1])
@@ -23,8 +22,11 @@ def run_set_up_commands(set_up_list) -> Constants:
 
 def run_command_commands(command_list, constants):
     """Runs the 'command' commands, ALERT and CANCEL"""
+    print(constants.propagate)
     for command in command_list:
         device, message, sim_time = command.split()[1:]
+        # Setting universal time for simulated run through
+        universal_time = 0
         # Set the correct types for each variable
         device = int(device)
         message = str(message)
@@ -33,11 +35,21 @@ def run_command_commands(command_list, constants):
             for prop in constants.propagate:
                 # Checks each propagate to see if device can send ALERT
                 if int(prop[0]) == device:
+                    sim_time = universal_time
                     print(f'@{sim_time}: #{device} SENT ALERT TO #{prop[1]}: {message}')
                     print(f'@{sim_time + int(prop[2])}: #{prop[1]} RECEIVED ALERT FROM #{device}: {message}')
+                    for prop2 in constants.propagate:
+                        if int(prop[1]) == prop2[0]:
+                            print(f'@{sim_time}: #{prop[1]} SENT ALERT TO #{prop2[1]}: {message}')
+                            print(f'@{sim_time + int(prop2[2])}: #{prop2[1]} RECEIVED ALERT FROM #{prop[1]}: {message}')
         elif command.startswith('CANCEL'):
             for prop in constants.propagate:
                 # Checks each propagate to see if device can send CANCEL
                 if int(prop[0]) == device:
                     print(f'@{sim_time}: #{device} SENT CANCELLATION TO #{prop[1]}: {message}')
                     print(f'@{sim_time + int(prop[2])}: #{prop[1]} RECEIVED CANCELLATION FROM #{device}: {message}')
+                    for prop2 in constants.propagate:
+                        if int(prop[1]) == prop2[0]:
+                            print(f'@{sim_time}: #{prop[1]} SENT CANCELLATION TO #{prop2[1]}: {message}')
+                            print(
+                                f'@{sim_time + int(prop2[2])}: #{prop2[1]} RECEIVED CANCELLATION FROM #{prop[1]}: {message}')
