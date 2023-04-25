@@ -3,6 +3,16 @@
 from devices import Device
 
 
+def run_device_commands(device_list) -> list:
+    """Makes device objects and stores them into a list"""
+    device_obj_list = []
+    for device in device_list:
+        device_obj = Device()
+        device_obj.device_id = int(device[-1])
+        device_obj_list.append(device_obj)
+    return device_obj_list
+
+
 def run_set_up_commands(set_up_list) -> Device:
     """Runs the set-up commands, Storing LENGTH, DEVICE, and PROPAGATE in Device"""
     for command in set_up_list:

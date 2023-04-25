@@ -15,7 +15,7 @@ import io
 from readinput import read_input_file_contents
 from verifycommands import get_commands, verify_commands_length, verify_commands_parameters
 from sortcommands import sort_cmd_list, sort_set_up_list, sort_command_list
-from runcommands import run_set_up_commands, run_command_commands
+from runcommands import run_device_commands, run_set_up_commands, run_command_commands
 from devices import Device
 
 class TestReadInput(unittest.TestCase):
@@ -92,11 +92,11 @@ class TestSortCommands(unittest.TestCase):
         """This tests if the function properly sorts the device and set-up lists"""
         test_set_up = ['PROPAGATE 50 12 10', 'LENGTH 123', 'DEVICE 50', 'DEVICE 12']
         # Testing function here
-        devices_list, set_up_list = sort_set_up_list(test_set_up)
+        test_devices_list, test_set_up_list = sort_set_up_list(test_set_up)
         expected_devices_list = ['DEVICE 50', 'DEVICE 12']
         expected_set_up_list = ['PROPAGATE 50 12 10', 'LENGTH 123']
-        self.assertEqual(devices_list, expected_devices_list)
-        self.assertEqual(set_up_list, expected_set_up_list)
+        self.assertEqual(test_devices_list, expected_devices_list)
+        self.assertEqual(test_set_up_list, expected_set_up_list)
 
     def test_sort_command_list(self):
         """This tests if function properly sorts the command list"""
@@ -108,6 +108,15 @@ class TestSortCommands(unittest.TestCase):
 
 class TestRunCommands(unittest.TestCase):
     """This tests functions within runcommands.py"""
+    def test_run_device_commands(self):
+        """Tests if device objects are created correctly"""
+        test_device_list = ['DEVICE 1', 'DEVICE 2']
+        # Testing function here
+        test_device_obj_list = run_device_commands(test_device_list)
+        self.assertEqual(len(test_device_obj_list) ,2)
+        self.assertEqual(test_device_obj_list[0].device_id, 1)
+        self.assertEqual(test_device_obj_list[1].device_id, 2)
+
     def test_set_up_commands(self):
         """Tests if set-up commands are run correctly"""
         test_set_up = ['PROPAGATE 50 12 10', 'LENGTH 123', 'DEVICE 50', 'DEVICE 12']
