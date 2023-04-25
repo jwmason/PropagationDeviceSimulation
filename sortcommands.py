@@ -11,7 +11,7 @@ def sort_cmd_list(cmd_list) -> list:
     command_list = []
     for command in cmd_list:
         # Separating LENGTH, DEVICE, and PROPAGATE commands as set-up commands
-        if command.startswith('LENGTH') or command.startswith('DEVICE') or command.startswith('PROPAGATE'):
+        if command.startswith('DEVICE') or command.startswith('PROPAGATE'):
             set_up_list.append(command)
         else:
             command_list.append(command)

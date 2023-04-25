@@ -119,12 +119,13 @@ class TestRunCommands(unittest.TestCase):
 
     def test_set_up_commands(self):
         """Tests if set-up commands are run correctly"""
-        test_set_up = ['PROPAGATE 50 12 10', 'LENGTH 123', 'DEVICE 50', 'DEVICE 12']
-        # Testing function
-        test_device = run_set_up_commands(test_set_up)
-        self.assertEqual(test_device.length, 123)
-        self.assertEqual(test_device.device_number_list, [50, 12])
-        self.assertEqual(test_device.propagate, [[50, 12, 10]])
+        test_set_up = ['PROPAGATE 1 2 10', 'PROPAGATE 2 1 100']
+        test_device_list = ['DEVICE 1', 'DEVICE 2']
+        test_device_obj_list = run_device_commands(test_device_list)
+        # Testing function here
+        test_device = run_set_up_commands(test_set_up, test_device_obj_list)
+        self.assertEqual(test_device[0].propagate, [[2, 10]])
+        self.assertEqual(test_device[1].propagate, [[1, 100]])
 
     def test_run_command_commands(self):
         """Tests if 'command' commands are run correctly"""

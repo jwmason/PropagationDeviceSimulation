@@ -13,21 +13,14 @@ def run_device_commands(device_list) -> list:
     return device_obj_list
 
 
-def run_set_up_commands(set_up_list) -> Device:
-    """Runs the set-up commands, Storing LENGTH, DEVICE, and PROPAGATE in Device"""
+def run_set_up_commands(set_up_list, device_obj_list) -> list:
+    """Runs the set-up commands, Storing PROPAGATE in Device"""
     for command in set_up_list:
-        # Initialize a Device class for each device
-        # Run the LENGTH command
-        if command.startswith('LENGTH'):
-            constants.length = int(command.split()[-1])
-        # Run the DEVICE command
-        elif command.startswith('DEVICE'):
-            constants.device_number_list.append(int(command.split()[-1]))
-        # Run the PROPAGATE command
-        elif command.startswith('PROPAGATE'):
-            device1, device2, time_pass = command.split()[1:]
-            constants.propagate.append([int(device1), int(device2), int(time_pass)])
-    return constants
+        device1, device2, time_pass = command.split()[1:]
+        for device in device_obj_list:
+            if int(device1) == device.device_id:
+                device.propagate.append([int(device2), int(time_pass)])
+    return device_obj_list
 
 
 def run_command_commands(command_list, constants):
