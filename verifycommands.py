@@ -72,8 +72,6 @@ def get_length(command_word_length, length_dict) -> dict:
     if length_word is not None:
         length_value = int(command_word_length[command_word_length.index(length_word) + 1])
         length_dict[length_word] = length_value
-        length_class = Length()
-        length_class.length = length_value
     return length_dict
 
 

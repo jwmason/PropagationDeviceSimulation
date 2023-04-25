@@ -11,7 +11,7 @@ def sort_cmd_list(cmd_list) -> list:
     command_list = []
     for command in cmd_list:
         # Separating LENGTH, DEVICE, and PROPAGATE commands as set-up commands
-        if command.startswith('DEVICE') or command.startswith('PROPAGATE'):
+        if command.startswith('LENGTH') or command.startswith('DEVICE') or command.startswith('PROPAGATE'):
             set_up_list.append(command)
         else:
             command_list.append(command)
@@ -19,17 +19,20 @@ def sort_cmd_list(cmd_list) -> list:
 
 
 def sort_set_up_list(set_up_list) -> list:
-    """Separates DEVICE commands from LENGTH and PROPAGATE"""
+    """Separates DEVICE and LENGTH commands from PROPAGATE"""
     devices = []
+    length = None
     # Have to create new list because old is mutable
     new_set_up_list = []
     for command in set_up_list:
         # This moves DEVICE commands to different list
         if command.startswith('DEVICE'):
             devices.append(command)
+        elif command.startswith('LENGTH'):
+            length = int(command.split()[-1])
         else:
             new_set_up_list.append(command)
-    return devices, new_set_up_list
+    return devices, new_set_up_list, length
 
 
 def sort_command_list(command_list) -> list:

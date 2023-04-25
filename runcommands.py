@@ -3,12 +3,13 @@
 from devices import Device
 
 
-def run_device_commands(device_list) -> list:
+def run_device_commands(device_list, length_value) -> list:
     """Makes device objects and stores them into a list"""
     device_obj_list = []
     for device in device_list:
         device_obj = Device()
         device_obj.device_id = int(device[-1])
+        device_obj.length = length_value
         device_obj_list.append(device_obj)
     return device_obj_list
 
@@ -23,23 +24,20 @@ def run_set_up_commands(set_up_list, device_obj_list) -> list:
     return device_obj_list
 
 
-def run_command_commands(command_list, constants):
+def run_command_commands(command_list, device_obj_list):
     """Runs the 'command' commands, ALERT and CANCEL"""
-    print(constants.propagate)
     for command in command_list:
         device, message, sim_time = command.split()[1:]
-        # Setting universal time for simulated run through
-        universal_time = 0
         # Set the correct types for each variable
         device = int(device)
         message = str(message)
         sim_time = int(sim_time)
         if command.startswith('ALERT'):
-            for prop in constants.propagate:
+            for device in device_obj_list:
                 # Checks each propagate to see if device can send ALERT
-                if int(prop[0]) == device:
-                    sim_time = universal_time
-                    print(f'@{sim_time}: #{device} SENT ALERT TO #{prop[1]}: {message}')
+                if device.device_id == device:
+                    for receiving_device in device.propagate:
+                        print(f'@{sim_time}: #{device} SENT ALERT TO #{receiving_device[0]}: {message}')
                     print(f'@{sim_time + int(prop[2])}: #{prop[1]} RECEIVED ALERT FROM #{device}: {message}')
                     for prop2 in constants.propagate:
                         if int(prop[1]) == prop2[0]:

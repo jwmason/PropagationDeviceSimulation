@@ -92,11 +92,13 @@ class TestSortCommands(unittest.TestCase):
         """This tests if the function properly sorts the device and set-up lists"""
         test_set_up = ['PROPAGATE 50 12 10', 'LENGTH 123', 'DEVICE 50', 'DEVICE 12']
         # Testing function here
-        test_devices_list, test_set_up_list = sort_set_up_list(test_set_up)
+        test_devices_list, test_set_up_list, test_length_value = sort_set_up_list(test_set_up)
         expected_devices_list = ['DEVICE 50', 'DEVICE 12']
-        expected_set_up_list = ['PROPAGATE 50 12 10', 'LENGTH 123']
+        expected_set_up_list = ['PROPAGATE 50 12 10']
+        expected_length_value = 123
         self.assertEqual(test_devices_list, expected_devices_list)
         self.assertEqual(test_set_up_list, expected_set_up_list)
+        self.assertEqual(test_length_value, expected_length_value)
 
     def test_sort_command_list(self):
         """This tests if function properly sorts the command list"""
@@ -112,10 +114,11 @@ class TestRunCommands(unittest.TestCase):
         """Tests if device objects are created correctly"""
         test_device_list = ['DEVICE 1', 'DEVICE 2']
         # Testing function here
-        test_device_obj_list = run_device_commands(test_device_list)
+        test_device_obj_list = run_device_commands(test_device_list, 123)
         self.assertEqual(len(test_device_obj_list) ,2)
         self.assertEqual(test_device_obj_list[0].device_id, 1)
         self.assertEqual(test_device_obj_list[1].device_id, 2)
+        self.assertEqual(test_device_obj_list[0].length, 123)
 
     def test_set_up_commands(self):
         """Tests if set-up commands are run correctly"""
