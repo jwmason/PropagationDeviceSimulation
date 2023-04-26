@@ -9,3 +9,5 @@ class Device:
         self.length = 0
         self.device_id = None
         self.propagate = []
+        self.cancel_received = False
+        self.cancel_time = 0

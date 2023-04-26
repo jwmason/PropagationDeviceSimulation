@@ -40,4 +40,10 @@ def sort_command_list(command_list) -> list:
     simulated time"""
     # The sorted function goes through the list and sorts based
     # on the value of the last integer in each command
-    return sorted(command_list, key = lambda command: int(command.split()[-1]))
+    new_command_list = command_list
+    for command in command_list:
+        # This moves ALERT commands to different list
+        if command.startswith('ALERT'):
+            new_command_list.remove(command)
+            new_command_list.append(command)
+    return new_command_list

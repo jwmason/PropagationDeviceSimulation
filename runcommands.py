@@ -34,12 +34,13 @@ def propagate_alert(device, receiving_device, message, sim_time, device_obj_list
     # Only execute if within simulated time length
     if (device.current_length + time_to_send) < device.length:
         if device.device_id != int(receiving_device[1]):
-            output_storage.output.append(f'@{sim_time}: #{device.device_id} SENT ALERT TO #{receiving_device[1]}: {message}')
-            output_storage.output.append(f'@{sim_time + time_to_send}: #{receiving_device[1]} RECEIVED ALERT FROM #{device.device_id}: {message}')
-            for next_receiving_device in device_obj_list:
-                # Check if the next receiving device is a neighbor of the current receiving device
-                if next_receiving_device.device_id == int(receiving_device[1]):
-                    return propagate_alert(next_receiving_device, next_receiving_device.propagate[0], message, sim_time + time_to_send, device_obj_list, output_storage)
+            if (device.cancel_received is True and device.current_length < device.cancel_time) or (device.cancel_received is False and device.current_length < device.length):
+                output_storage.output.append(f'@{sim_time}: #{device.device_id} SENT ALERT TO #{receiving_device[1]}: {message}')
+                output_storage.output.append(f'@{sim_time + time_to_send}: #{receiving_device[1]} RECEIVED ALERT FROM #{device.device_id}: {message}')
+                for next_receiving_device in device_obj_list:
+                    # Check if the next receiving device is a neighbor of the current receiving device
+                    if next_receiving_device.device_id == int(receiving_device[1]):
+                        return propagate_alert(next_receiving_device, next_receiving_device.propagate[0], message, sim_time + time_to_send, device_obj_list, output_storage)
         else:
             return True
     else:
@@ -52,14 +53,18 @@ def propagate_cancel(device, receiving_device, message, sim_time, device_obj_lis
     # Setting current simulated time
     device.current_length = sim_time
     # Only execute if within simulated time length
-    if device.current_length < device.length:
+    if (device.current_length + time_to_send) < device.length:
         if device.device_id != int(receiving_device[1]):
             output_storage.output.append(f'@{sim_time}: #{device.device_id} SENT CANCELLATION TO #{receiving_device[1]}: {message}')
             output_storage.output.append(f'@{sim_time + time_to_send}: #{receiving_device[1]} RECEIVED CANCELLATION FROM #{device.device_id}: {message}')
+            device.cancel_received = True
+            device.cancel_time = sim_time
             for next_receiving_device in device_obj_list:
                 # Check if the next receiving device is a neighbor of the current receiving device
-                if next_receiving_device.device_id == int(receiving_device[1]):
-                    return propagate_cancel(device, next_receiving_device.propagate[0], message, sim_time + time_to_send, device_obj_list, output_storage)
+                if next_receiving_device.device_id == int(receiving_device[1]) and next_receiving_device.cancel_received is False:
+                    next_receiving_device.cancel_received = True
+                    next_receiving_device.cancel_time = sim_time
+                    return propagate_cancel(next_receiving_device, next_receiving_device.propagate[0], message, sim_time + time_to_send, device_obj_list, output_storage)
         else:
             output_storage.output.append(f'@{sim_time + time_to_send}: #{receiving_device[1]} RECEIVED CANCELLATION FROM #{receiving_device[0]}: {message}')
             return True
@@ -76,19 +81,7 @@ def run_command_commands(command_list, device_obj_list):
         current_device = int(device)
         message = str(message)
         sim_time = int(sim_time)
-        if command.startswith('ALERT'):
-            alert_propagated = False
-            for device in device_obj_list:
-                # Checks each propagate to see if device can send ALERT
-                if device.device_id == current_device:
-                    for receiving_device in device.propagate:
-                        if propagate_alert(device, receiving_device, message, sim_time,
-                                           device_obj_list, output_storage):
-                            alert_propagated = True
-            # This is raised when the simulated time is greater than simulated length
-            if alert_propagated:
-                pass
-        elif command.startswith('CANCEL'):
+        if command.startswith('CANCEL'):
             cancel_propagated = False
             for device in device_obj_list:
                 # Checks each propagate to see if device can send ALERT
@@ -100,5 +93,18 @@ def run_command_commands(command_list, device_obj_list):
             # This is raised when the simulated time is greater than simulated length
             if cancel_propagated:
                 output_storage.output.append(f'@{device.length}: END')
+        elif command.startswith('ALERT'):
+            alert_propagated = False
+            for device in device_obj_list:
+                # Checks each propagate to see if device can send ALERT
+                if device.device_id == current_device:
+                    for receiving_device in device.propagate:
+                        if propagate_alert(device, receiving_device, message, sim_time,
+                                           device_obj_list, output_storage):
+                            alert_propagated = True
+            # This is raised when the simulated time is greater than simulated length
+            if alert_propagated:
+                pass
+    output_storage.output.append(f'@{device.length}: END')
     for output in sorted(output_storage.output, key=lambda x: int(x.split('@')[-1].split(':')[0]) if '@' in x else -1):
         print(output)
