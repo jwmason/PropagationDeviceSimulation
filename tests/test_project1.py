@@ -15,7 +15,7 @@ import io
 from readinput import read_input_file_contents
 from verifycommands import get_commands, verify_commands_length, verify_commands_parameters
 from sortcommands import sort_cmd_list, sort_set_up_list, sort_command_list
-from runcommands import run_device_commands, run_set_up_commands, run_command_commands
+from runcommands import run_device_commands, run_set_up_commands, run_command_commands, propagate_alert
 from devices import Device
 
 class TestReadInput(unittest.TestCase):
