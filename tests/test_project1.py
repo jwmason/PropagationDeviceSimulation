@@ -133,7 +133,7 @@ class TestRunCommands(unittest.TestCase):
     def test_run_command_commands(self):
         """Tests if 'command' commands are run correctly"""
         test_device_list = ['DEVICE 1', 'DEVICE 2']
-        test_device_obj_list = run_device_commands(test_device_list, 1000)
+        test_device_obj_list = run_device_commands(test_device_list, 220)
         test_set_up = ['PROPAGATE 1 2 10', 'PROPAGATE 2 1 100']
         test_device = run_set_up_commands(test_set_up, test_device_obj_list)
         test_command_list = ['ALERT 1 ohno 0', 'CANCEL 1 testerror 200']
@@ -143,7 +143,8 @@ class TestRunCommands(unittest.TestCase):
         expected_output = '@0: #1 SENT ALERT TO #2: ohno\n' \
                           '@10: #2 RECEIVED ALERT FROM #1: ohno\n' \
                           '@200: #1 SENT CANCELLATION TO #2: testerror\n' \
-                          '@210: #2 RECEIVED CANCELLATION FROM #1: testerror\n'
+                          '@210: #2 RECEIVED CANCELLATION FROM #1: testerror\n' \
+                          '@220: END\n'
         self.assertEqual(output.getvalue(), expected_output)
 
 if __name__ == '__main__':
