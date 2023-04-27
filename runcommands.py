@@ -74,7 +74,9 @@ def propagate_alert(device, receiving_device, message, sim_time, device_obj_list
                     # Check if the next receiving device is a neighbor of the current receiving device
                     if next_receiving_device.device_id == int(receiving_device[1]):
                         # Recursion
-                        return propagate_alert(next_receiving_device, next_receiving_device.propagate[0], message, sim_time + time_to_send, device_obj_list, output_storage)
+                        if next_receiving_device.propagate and len(
+                                next_receiving_device.propagate) > 0:
+                            return propagate_alert(next_receiving_device, next_receiving_device.propagate[0], message, sim_time + time_to_send, device_obj_list, output_storage)
         else:
             return True
     else:

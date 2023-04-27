@@ -166,6 +166,21 @@ class TestRunCommands(unittest.TestCase):
                           '@150: END\n'
         self.assertEqual(output.getvalue(), expected_output)
 
+    def test_alert_and_cancel_commands_edge_case_2(self):
+        """Test an edge case if cancellation received before alert"""
+        test_device_list = ['DEVICE 1', 'DEVICE 2']
+        test_device_obj_list = device_set_up(test_device_list, 1000)
+        test_set_up = ['PROPAGATE 1 2 100']
+        test_device = propagate_commands(test_set_up, test_device_obj_list)
+        test_command_list = ['CANCEL 1 testerror 0', 'ALERT 1 testerror 100']
+        # Testing function
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            alert_and_cancel_commands(test_command_list, test_device)
+        expected_output = '@0: #1 SENT CANCELLATION TO #2: testerror\n' \
+                          '@100: #2 RECEIVED CANCELLATION FROM #1: testerror\n' \
+                          '@1000: END\n'
+        self.assertEqual(output.getvalue(), expected_output)
+
 
 if __name__ == '__main__':
     unittest.main()
