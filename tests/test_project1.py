@@ -161,6 +161,7 @@ class TestRunCommands(unittest.TestCase):
         # Testing function
         with contextlib.redirect_stdout(io.StringIO()) as output:
             alert_and_cancel_commands(test_command_list, test_device)
+
         expected_output = '@0: #1 SENT CANCELLATION TO #2: testerror\n' \
                           '@100: #2 RECEIVED CANCELLATION FROM #1: testerror\n' \
                           '@150: END\n'
@@ -181,6 +182,34 @@ class TestRunCommands(unittest.TestCase):
                           '@1000: END\n'
         self.assertEqual(output.getvalue(), expected_output)
 
+    def test_propagate_cancel_sample_input(self):
+        """Tests sample_input and sample_output to assure success"""
+        test_device_list = ['DEVICE 1', 'DEVICE 2', 'DEVICE 3', 'DEVICE 4']
+        test_device_obj_list = device_set_up(test_device_list, 9999)
+        test_set_up = ['PROPAGATE 1 2 750', 'PROPAGATE 2 3 1250', 'PROPAGATE 3 4 500', 'PROPAGATE 4 1 1000']
+        test_device = propagate_commands(test_set_up, test_device_obj_list)
+        test_command_list = ['CANCEL 1 Trouble 2200', 'ALERT 1 Trouble 0']
+        # Testing function
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            alert_and_cancel_commands(test_command_list, test_device)
+        expected_output =   '@0: #1 SENT ALERT TO #2: Trouble\n' \
+                            '@750: #2 RECEIVED ALERT FROM #1: Trouble\n' \
+                            '@750: #2 SENT ALERT TO #3: Trouble\n' \
+                            '@2000: #3 RECEIVED ALERT FROM #2: Trouble\n' \
+                            '@2000: #3 SENT ALERT TO #4: Trouble\n' \
+                            '@2200: #1 SENT CANCELLATION TO #2: Trouble\n' \
+                            '@2500: #4 RECEIVED ALERT FROM #3: Trouble\n' \
+                            '@2500: #4 SENT ALERT TO #1: Trouble\n' \
+                            '@2950: #2 RECEIVED CANCELLATION FROM #1: Trouble\n' \
+                            '@2950: #2 SENT CANCELLATION TO #3: Trouble\n' \
+                            '@3500: #1 RECEIVED ALERT FROM #4: Trouble\n' \
+                            '@4200: #3 RECEIVED CANCELLATION FROM #2: Trouble\n' \
+                            '@4200: #3 SENT CANCELLATION TO #4: Trouble\n' \
+                            '@4700: #4 RECEIVED CANCELLATION FROM #3: Trouble\n' \
+                            '@4700: #4 SENT CANCELLATION TO #1: Trouble\n' \
+                            '@5700: #1 RECEIVED CANCELLATION FROM #4: Trouble\n' \
+                            '@9999: END\n'
+        self.assertEqual(output.getvalue(), expected_output)
 
 if __name__ == '__main__':
     unittest.main()

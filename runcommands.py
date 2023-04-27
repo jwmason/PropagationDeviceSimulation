@@ -109,7 +109,6 @@ def propagate_cancel(device, receiving_device, message, sim_time, device_obj_lis
                     if next_receiving_device.propagate and len(next_receiving_device.propagate) > 0:
                         return propagate_cancel(next_receiving_device, next_receiving_device.propagate[0], message, sim_time + time_to_send, device_obj_list, output_storage)
         else:
-            output_storage.output.append(f'@{sim_time + time_to_send}: #{receiving_device[1]} RECEIVED CANCELLATION FROM #{receiving_device[0]}: {message}')
             return True
     else:
         return False
