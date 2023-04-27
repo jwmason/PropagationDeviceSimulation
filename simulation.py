@@ -4,7 +4,7 @@
 from readinput import _read_input_file_path, read_input_file_contents
 from verifycommands import get_commands, verify_commands_length, verify_commands_parameters
 from sortcommands import sort_cmd_list, sort_set_up_list, sort_command_list
-from runcommands import run_device_commands, run_set_up_commands, run_command_commands
+from runcommands import device_set_up, propagate_commands, alert_and_cancel_commands
 
 # Function Not Test Covered:
 # No test coverage for this module because it simply runs all the sub-modules that
@@ -24,6 +24,6 @@ def run() -> None:
     devices, set_up_list, length = sort_set_up_list(set_up_list)
     command_list = sort_command_list(command_list)
     # runcommands.py
-    test_device_obj_list = run_device_commands(devices, length)
-    device_obj_list = run_set_up_commands(set_up_list, test_device_obj_list)
-    run_command_commands(command_list, device_obj_list)
+    test_device_obj_list = device_set_up(devices, length)
+    device_obj_list = propagate_commands(set_up_list, test_device_obj_list)
+    alert_and_cancel_commands(command_list, device_obj_list)

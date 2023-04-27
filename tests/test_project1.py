@@ -15,7 +15,7 @@ import io
 from readinput import read_input_file_contents
 from verifycommands import get_commands, verify_commands_length, verify_commands_parameters
 from sortcommands import sort_cmd_list, sort_set_up_list, sort_command_list
-from runcommands import run_device_commands, run_set_up_commands, run_command_commands
+from runcommands import device_set_up, propagate_commands, alert_and_cancel_commands
 from simulation import run
 
 
@@ -112,36 +112,36 @@ class TestSortCommands(unittest.TestCase):
 
 class TestRunCommands(unittest.TestCase):
     """This tests functions within runcommands.py"""
-    def test_run_device_commands(self):
+    def test_device_set_up(self):
         """Tests if device objects are created correctly"""
         test_device_list = ['DEVICE 1', 'DEVICE 2']
         # Testing function here
-        test_device_obj_list = run_device_commands(test_device_list, 123)
+        test_device_obj_list = device_set_up(test_device_list, 123)
         self.assertEqual(len(test_device_obj_list) ,2)
         self.assertEqual(test_device_obj_list[0].device_id, 1)
         self.assertEqual(test_device_obj_list[1].device_id, 2)
         self.assertEqual(test_device_obj_list[0].length, 123)
 
-    def test_set_up_commands(self):
-        """Tests if set-up commands are run correctly"""
+    def test_propagate_commands(self):
+        """Tests if PROPAGATE commands are stored correctly"""
         test_set_up = ['PROPAGATE 1 2 10', 'PROPAGATE 2 1 100']
         test_device_list = ['DEVICE 1', 'DEVICE 2']
-        test_device_obj_list = run_device_commands(test_device_list, 123)
+        test_device_obj_list = device_set_up(test_device_list, 123)
         # Testing function here
-        test_device = run_set_up_commands(test_set_up, test_device_obj_list)
+        test_device = propagate_commands(test_set_up, test_device_obj_list)
         self.assertEqual(test_device[0].propagate, [[1, 2, 10]])
         self.assertEqual(test_device[1].propagate, [[2, 1, 100]])
 
-    def test_run_command_commands(self):
-        """Tests if 'command' commands are run correctly"""
+    def test_alert_and_cancel_commands(self):
+        """Tests if ALERT and CANCEL commands are run correctly"""
         test_device_list = ['DEVICE 1', 'DEVICE 2']
-        test_device_obj_list = run_device_commands(test_device_list, 220)
+        test_device_obj_list = device_set_up(test_device_list, 220)
         test_set_up = ['PROPAGATE 1 2 100', 'PROPAGATE 2 1 100']
-        test_device = run_set_up_commands(test_set_up, test_device_obj_list)
+        test_device = propagate_commands(test_set_up, test_device_obj_list)
         test_command_list = ['ALERT 1 ohno 0', 'CANCEL 1 testerror 100']
         # Testing function
         with contextlib.redirect_stdout(io.StringIO()) as output:
-            run_command_commands(test_command_list, test_device)
+            alert_and_cancel_commands(test_command_list, test_device)
         expected_output = '@0: #1 SENT ALERT TO #2: ohno\n' \
                           '@100: #2 RECEIVED ALERT FROM #1: ohno\n' \
                           '@100: #2 SENT ALERT TO #1: ohno\n' \
@@ -151,16 +151,16 @@ class TestRunCommands(unittest.TestCase):
                           '@220: END\n'
         self.assertEqual(output.getvalue(), expected_output)
 
-    def test_run_command_commands_conditionals(self):
-        """Test the edge cases of command commands"""
+    def test_alert_and_cancel_commands_edge_case_1(self):
+        """Test an edge case if only one propagate command"""
         test_device_list = ['DEVICE 1', 'DEVICE 2']
-        test_device_obj_list = run_device_commands(test_device_list, 150)
+        test_device_obj_list = device_set_up(test_device_list, 150)
         test_set_up = ['PROPAGATE 1 2 100']
-        test_device = run_set_up_commands(test_set_up, test_device_obj_list)
+        test_device = propagate_commands(test_set_up, test_device_obj_list)
         test_command_list = ['CANCEL 1 testerror 0']
         # Testing function
         with contextlib.redirect_stdout(io.StringIO()) as output:
-            run_command_commands(test_command_list, test_device)
+            alert_and_cancel_commands(test_command_list, test_device)
         expected_output = '@0: #1 SENT CANCELLATION TO #2: testerror\n' \
                           '@100: #2 RECEIVED CANCELLATION FROM #1: testerror\n' \
                           '@150: END\n'

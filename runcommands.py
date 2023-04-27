@@ -3,7 +3,7 @@
 from devices import Device
 from sortoutput import Output
 
-def run_device_commands(device_list, length_value) -> list:
+def device_set_up(device_list, length_value) -> list:
     """Makes device objects and stores them into a list"""
     device_obj_list = []
     for device in device_list:
@@ -14,7 +14,7 @@ def run_device_commands(device_list, length_value) -> list:
     return device_obj_list
 
 
-def run_set_up_commands(set_up_list, device_obj_list) -> list:
+def propagate_commands(set_up_list, device_obj_list) -> list:
     """Runs the set-up commands, Storing PROPAGATE values in Device"""
     for command in set_up_list:
         device1, device2, time_pass = command.split()[1:]
@@ -26,7 +26,7 @@ def run_set_up_commands(set_up_list, device_obj_list) -> list:
     return device_obj_list
 
 
-def run_command_commands(command_list, device_obj_list):
+def alert_and_cancel_commands(command_list, device_obj_list):
     """Runs the CANCEL and ALERT commands"""
     # Define output class for output storing
     output_storage = Output()
