@@ -26,6 +26,35 @@ def run_set_up_commands(set_up_list, device_obj_list) -> list:
     return device_obj_list
 
 
+def run_command_commands(command_list, device_obj_list):
+    """Runs the CANCEL and ALERT commands"""
+    # Define output class for output storing
+    output_storage = Output()
+    for command in command_list:
+        device, message, sim_time = command.split()[1:]
+        # Set the correct types for each variable
+        current_device = int(device)
+        message = str(message)
+        sim_time = int(sim_time)
+        if command.startswith('CANCEL'):
+            for device in device_obj_list:
+                # Checks each propagate to see if device can send ALERT
+                if device.device_id == current_device:
+                    for receiving_device in device.propagate:
+                        if propagate_cancel(device, receiving_device, message, sim_time,
+                                           device_obj_list, output_storage):
+                            cancel_propagated = True
+        elif command.startswith('ALERT'):
+            for device in device_obj_list:
+                # Checks each propagate to see if device can send ALERT
+                if device.device_id == current_device:
+                    for receiving_device in device.propagate:
+                        if propagate_alert(device, receiving_device, message, sim_time,
+                                           device_obj_list, output_storage):
+                            pass
+    output_storage.output.append(f'@{device.length}: END')
+    sort_output(output_storage)
+
 def propagate_alert(device, receiving_device, message, sim_time, device_obj_list, output_storage):
     """Propagate the ALERT to the receiving device and recursion to see if the receiving device
     can send to another device"""
@@ -65,7 +94,7 @@ def propagate_cancel(device, receiving_device, message, sim_time, device_obj_lis
         if device.device_id != int(receiving_device[1]):
             output_storage.output.append(f'@{sim_time}: #{device.device_id} SENT CANCELLATION TO #{receiving_device[1]}: {message}')
             output_storage.output.append(f'@{sim_time + time_to_send}: #{receiving_device[1]} RECEIVED CANCELLATION FROM #{device.device_id}: {message}')
-            # Establsih device as receiving cancel message
+            # Establish device as receiving cancel message
             device.cancel_received = True
             device.cancel_time = sim_time
             for next_receiving_device in device_obj_list:
@@ -84,32 +113,7 @@ def propagate_cancel(device, receiving_device, message, sim_time, device_obj_lis
         return False
 
 
-def run_command_commands(command_list, device_obj_list):
-    """Runs the CANCEL and ALERT commands"""
-    # Define output class for output storing
-    output_storage = Output()
-    for command in command_list:
-        device, message, sim_time = command.split()[1:]
-        # Set the correct types for each variable
-        current_device = int(device)
-        message = str(message)
-        sim_time = int(sim_time)
-        if command.startswith('CANCEL'):
-            for device in device_obj_list:
-                # Checks each propagate to see if device can send ALERT
-                if device.device_id == current_device:
-                    for receiving_device in device.propagate:
-                        if propagate_cancel(device, receiving_device, message, sim_time,
-                                           device_obj_list, output_storage):
-                            cancel_propagated = True
-        elif command.startswith('ALERT'):
-            for device in device_obj_list:
-                # Checks each propagate to see if device can send ALERT
-                if device.device_id == current_device:
-                    for receiving_device in device.propagate:
-                        if propagate_alert(device, receiving_device, message, sim_time,
-                                           device_obj_list, output_storage):
-                            pass
-    output_storage.output.append(f'@{device.length}: END')
+def sort_output(output_storage):
+    """Sorts the output and prints it"""
     for output in sorted(output_storage.output, key=lambda x: int(x.split('@')[-1].split(':')[0]) if '@' in x else -1):
         print(output)
