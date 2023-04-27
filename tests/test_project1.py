@@ -15,8 +15,9 @@ import io
 from readinput import read_input_file_contents
 from verifycommands import get_commands, verify_commands_length, verify_commands_parameters
 from sortcommands import sort_cmd_list, sort_set_up_list, sort_command_list
-from runcommands import run_device_commands, run_set_up_commands, run_command_commands, propagate_alert
-from devices import Device
+from runcommands import run_device_commands, run_set_up_commands, run_command_commands
+from simulation import run
+
 
 class TestReadInput(unittest.TestCase):
     """Testing functions in readinput.py"""
@@ -108,6 +109,7 @@ class TestSortCommands(unittest.TestCase):
         expected_command_list = ['CANCEL 50 testerror 3', 'CANCEL 3 test 55', 'ALERT 1 ohno 100']
         self.assertEqual(command_list, expected_command_list)
 
+
 class TestRunCommands(unittest.TestCase):
     """This tests functions within runcommands.py"""
     def test_run_device_commands(self):
@@ -127,25 +129,43 @@ class TestRunCommands(unittest.TestCase):
         test_device_obj_list = run_device_commands(test_device_list, 123)
         # Testing function here
         test_device = run_set_up_commands(test_set_up, test_device_obj_list)
-        self.assertEqual(test_device[0].propagate, [[2, 10]])
-        self.assertEqual(test_device[1].propagate, [[1, 100]])
+        self.assertEqual(test_device[0].propagate, [[1, 2, 10]])
+        self.assertEqual(test_device[1].propagate, [[2, 1, 100]])
 
     def test_run_command_commands(self):
         """Tests if 'command' commands are run correctly"""
         test_device_list = ['DEVICE 1', 'DEVICE 2']
         test_device_obj_list = run_device_commands(test_device_list, 220)
-        test_set_up = ['PROPAGATE 1 2 10', 'PROPAGATE 2 1 100']
+        test_set_up = ['PROPAGATE 1 2 100', 'PROPAGATE 2 1 100']
         test_device = run_set_up_commands(test_set_up, test_device_obj_list)
-        test_command_list = ['ALERT 1 ohno 0', 'CANCEL 1 testerror 200']
+        test_command_list = ['ALERT 1 ohno 0', 'CANCEL 1 testerror 100']
         # Testing function
         with contextlib.redirect_stdout(io.StringIO()) as output:
             run_command_commands(test_command_list, test_device)
         expected_output = '@0: #1 SENT ALERT TO #2: ohno\n' \
-                          '@10: #2 RECEIVED ALERT FROM #1: ohno\n' \
-                          '@200: #1 SENT CANCELLATION TO #2: testerror\n' \
-                          '@210: #2 RECEIVED CANCELLATION FROM #1: testerror\n' \
+                          '@100: #2 RECEIVED ALERT FROM #1: ohno\n' \
+                          '@100: #2 SENT ALERT TO #1: ohno\n' \
+                          '@100: #1 SENT CANCELLATION TO #2: testerror\n' \
+                          '@200: #1 RECEIVED ALERT FROM #2: ohno\n' \
+                          '@200: #2 RECEIVED CANCELLATION FROM #1: testerror\n' \
                           '@220: END\n'
         self.assertEqual(output.getvalue(), expected_output)
+
+    def test_run_command_commands_conditionals(self):
+        """Test the edge cases of command commands"""
+        test_device_list = ['DEVICE 1', 'DEVICE 2']
+        test_device_obj_list = run_device_commands(test_device_list, 150)
+        test_set_up = ['PROPAGATE 1 2 100']
+        test_device = run_set_up_commands(test_set_up, test_device_obj_list)
+        test_command_list = ['CANCEL 1 testerror 0']
+        # Testing function
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            run_command_commands(test_command_list, test_device)
+        expected_output = '@0: #1 SENT CANCELLATION TO #2: testerror\n' \
+                          '@100: #2 RECEIVED CANCELLATION FROM #1: testerror\n' \
+                          '@150: END\n'
+        self.assertEqual(output.getvalue(), expected_output)
+
 
 if __name__ == '__main__':
     unittest.main()

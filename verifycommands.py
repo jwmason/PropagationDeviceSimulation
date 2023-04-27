@@ -42,25 +42,18 @@ def verify_commands_parameters(cmd_list) -> list:
     """Check if the parameters in each command are valid"""
     length_dict = {}
     valid_cmds = []
-
     for cmd in cmd_list:
-
         # Split each command by whitespace
         command_word_length = cmd.split()
         length_dict = get_length(command_word_length, length_dict)
-
         # See what command is being called so I can verify how many parameters are being verified
         first_word = command_word_length[0]
-
         # Adding valid length and device commands to command list
         check_length_and_device(command_word_length, first_word, cmd, valid_cmds)
-
         # Adding valid propagate commands to command list
         check_propagate(command_word_length, first_word, cmd, valid_cmds, cmd_list)
-
         # Adding valid alert and cancel commands to command list
         check_alert_and_cancel(command_word_length, first_word, cmd, valid_cmds, cmd_list, length_dict)
-
     return valid_cmds
 
 
@@ -82,6 +75,7 @@ def check_length_and_device(command_word_length, first_word, cmd, valid_cmds) ->
                 valid_cmds.append(cmd)
         except ValueError:
             pass
+
 
 def check_propagate(command_word_length, first_word, cmd, valid_cmds, cmd_list) -> None:
     """Checking that PROPAGATE three positive integer values, and that those devices exist"""

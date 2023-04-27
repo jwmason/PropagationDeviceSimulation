@@ -15,7 +15,7 @@ def run_device_commands(device_list, length_value) -> list:
 
 
 def run_set_up_commands(set_up_list, device_obj_list) -> list:
-    """Runs the set-up commands, Storing PROPAGATE in Device"""
+    """Runs the set-up commands, Storing PROPAGATE values in Device"""
     for command in set_up_list:
         device1, device2, time_pass = command.split()[1:]
         # if device is first term in PROPAGATE command, add that propagation
@@ -27,19 +27,24 @@ def run_set_up_commands(set_up_list, device_obj_list) -> list:
 
 
 def propagate_alert(device, receiving_device, message, sim_time, device_obj_list, output_storage):
-    """Propagate the alert to the receiving device"""
+    """Propagate the ALERT to the receiving device and recursion to see if the receiving device
+    can send to another device"""
+    # The delay it takes to send a message
     time_to_send = int(receiving_device[-1])
     # Setting current simulated time
     device.current_length = sim_time
     # Only execute if within simulated time length
     if (device.current_length + time_to_send) < device.length:
+        # Making sure device doesn't propagate itself
         if device.device_id != int(receiving_device[1]):
+            # Checking if the device has received cancel message
             if (device.cancel_received is True and device.current_length < device.cancel_time) or (device.cancel_received is False and device.current_length < device.length):
                 output_storage.output.append(f'@{sim_time}: #{device.device_id} SENT ALERT TO #{receiving_device[1]}: {message}')
                 output_storage.output.append(f'@{sim_time + time_to_send}: #{receiving_device[1]} RECEIVED ALERT FROM #{device.device_id}: {message}')
                 for next_receiving_device in device_obj_list:
                     # Check if the next receiving device is a neighbor of the current receiving device
                     if next_receiving_device.device_id == int(receiving_device[1]):
+                        # Recursion
                         return propagate_alert(next_receiving_device, next_receiving_device.propagate[0], message, sim_time + time_to_send, device_obj_list, output_storage)
         else:
             return True
@@ -48,23 +53,30 @@ def propagate_alert(device, receiving_device, message, sim_time, device_obj_list
 
 
 def propagate_cancel(device, receiving_device, message, sim_time, device_obj_list, output_storage):
-    """Propagate the cancel to the receiving device"""
+    """Propagate the CANCEL to the receiving device and recursion to see if the receiving device
+    can send to another device"""
+    # The delay it takes to send a message
     time_to_send = int(receiving_device[-1])
     # Setting current simulated time
     device.current_length = sim_time
     # Only execute if within simulated time length
     if (device.current_length + time_to_send) < device.length:
+        # Makes sure device doesn't propagate itself
         if device.device_id != int(receiving_device[1]):
             output_storage.output.append(f'@{sim_time}: #{device.device_id} SENT CANCELLATION TO #{receiving_device[1]}: {message}')
             output_storage.output.append(f'@{sim_time + time_to_send}: #{receiving_device[1]} RECEIVED CANCELLATION FROM #{device.device_id}: {message}')
+            # Establsih device as receiving cancel message
             device.cancel_received = True
             device.cancel_time = sim_time
             for next_receiving_device in device_obj_list:
                 # Check if the next receiving device is a neighbor of the current receiving device
                 if next_receiving_device.device_id == int(receiving_device[1]) and next_receiving_device.cancel_received is False:
+                    # Establish receiving device has getting cancel message
                     next_receiving_device.cancel_received = True
                     next_receiving_device.cancel_time = sim_time
-                    return propagate_cancel(next_receiving_device, next_receiving_device.propagate[0], message, sim_time + time_to_send, device_obj_list, output_storage)
+                    # Recursion
+                    if next_receiving_device.propagate and len(next_receiving_device.propagate) > 0:
+                        return propagate_cancel(next_receiving_device, next_receiving_device.propagate[0], message, sim_time + time_to_send, device_obj_list, output_storage)
         else:
             output_storage.output.append(f'@{sim_time + time_to_send}: #{receiving_device[1]} RECEIVED CANCELLATION FROM #{receiving_device[0]}: {message}')
             return True
@@ -73,7 +85,8 @@ def propagate_cancel(device, receiving_device, message, sim_time, device_obj_lis
 
 
 def run_command_commands(command_list, device_obj_list):
-    """Runs the 'command' commands, ALERT"""
+    """Runs the CANCEL and ALERT commands"""
+    # Define output class for output storing
     output_storage = Output()
     for command in command_list:
         device, message, sim_time = command.split()[1:]
@@ -82,7 +95,6 @@ def run_command_commands(command_list, device_obj_list):
         message = str(message)
         sim_time = int(sim_time)
         if command.startswith('CANCEL'):
-            cancel_propagated = False
             for device in device_obj_list:
                 # Checks each propagate to see if device can send ALERT
                 if device.device_id == current_device:
@@ -90,21 +102,14 @@ def run_command_commands(command_list, device_obj_list):
                         if propagate_cancel(device, receiving_device, message, sim_time,
                                            device_obj_list, output_storage):
                             cancel_propagated = True
-            # This is raised when the simulated time is greater than simulated length
-            if cancel_propagated:
-                output_storage.output.append(f'@{device.length}: END')
         elif command.startswith('ALERT'):
-            alert_propagated = False
             for device in device_obj_list:
                 # Checks each propagate to see if device can send ALERT
                 if device.device_id == current_device:
                     for receiving_device in device.propagate:
                         if propagate_alert(device, receiving_device, message, sim_time,
                                            device_obj_list, output_storage):
-                            alert_propagated = True
-            # This is raised when the simulated time is greater than simulated length
-            if alert_propagated:
-                pass
+                            pass
     output_storage.output.append(f'@{device.length}: END')
     for output in sorted(output_storage.output, key=lambda x: int(x.split('@')[-1].split(':')[0]) if '@' in x else -1):
         print(output)
