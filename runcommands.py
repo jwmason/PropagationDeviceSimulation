@@ -44,7 +44,7 @@ def alert_and_cancel_commands(command_list, device_obj_list):
                         if propagate_cancel(device, receiving_device, message, sim_time,
                                            device_obj_list, output_storage):
                             cancel_propagated = True
-        elif command.startswith('ALERT'):
+        if command.startswith('ALERT'):
             for device in device_obj_list:
                 # Checks each propagate to see if device can send ALERT
                 if device.device_id == current_device:
